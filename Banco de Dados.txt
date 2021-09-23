@@ -1,0 +1,87 @@
+create database spt;
+
+use spt;
+
+create table tanque(
+codtanq varchar (20) primary key not null,
+localizacao varchar (30) not null
+);
+
+create table sensor(
+nomedispositivo varchar (20) primary key not null,
+codsensor varchar (20) not null,
+foreign key (codsensor) references tanque (codtanq)
+);
+
+create table dados(
+nomedispositivo varchar (20) not null,
+tempo time not null,
+valorsensor float not null, 
+foreign key (nomedispositivo) references sensor(nomedispositivo)
+);
+
+
+create table tag(
+id_tag int primary key AUTO_INCREMENT,
+codtag varchar (20) not null,
+data date not null,
+horario time not null,
+comentario varchar (140) not null, 
+autor varchar (30) not null,
+foreign key (codtag) references tanque (codtanq)
+);
+
+
+#Inserir dados nas tabelas:
+
+insert into tanque(codtanq,localizacao) values
+('STAST-478', 'Southeast '),
+('STUST-357', 'Northeast');
+
+select * from tanque;
+
+insert into sensor(codsensor, nomedispositivo) values
+('STAST-478','SPTLevelDevice1'),
+('STAST-478','SPTInterfaceDevice1'),
+('STUST-357','SPTLevelDevice2'),
+('STUST-357','SPTInterfaceDevice2');
+
+select * from sensor;
+ 
+insert into dados(nomedispositivo, tempo, valorsensor) values
+('SPTLevelDevice1','00:00:45','50'),
+('SPTLevelDevice1','00:00:55','60'),
+('SPTLevelDevice1','00:01:05','70'),
+('SPTInterfaceDevice1','00:00:55','55'),
+('SPTInterfaceDevice1','00:01:15','30'),
+('SPTInterfaceDevice1','00:02:55','30'),
+('SPTLevelDevice2','00:00:45','50'),
+('SPTLevelDevice2','00:00:55','60'),
+('SPTLevelDevice2','00:01:05','70'),
+('SPTInterfaceDevice2','00:00:55','55'),
+('SPTInterfaceDevice2','00:01:15','30'),
+('SPTInterfaceDevice2','00:02:55','30'),
+('SPTInterfaceDevice2','00:04:30','40');
+
+select * from dados;
+
+insert into tag(codtag, data, horario, comentario, autor) values
+('STAST-478', '2021-09-07', '08:55:05', 'Drenagem realizada', 'Vivian C.'),
+('STUST-357', '2021-09-07', '09:08:33', 'Manutenção realizada', 'Kaline M.'),
+('STUST-357', '2021-10-01', '10:00:05', 'Drenagem realizada', 'Kaline M.'),
+('STUST-357', '2021-11-05', '13:07:35', 'Supervisão realizada', 'Vivian C.');
+
+select * from tag;
+
+#Consultas:
+#1 - Qual a tag mais recente do tanque de armazenamento 'STUST-357'?
+
+select id_tag,comentario,autor,max(data) as data from tag where codtag = 'STUST-357';
+
+#2 - Quantos valores foram coletados no tanque de armazenamento 'STAST-478'?
+
+select count(valorsensor) as quantidadeValorSTAST from dados inner join (select nomedispositivo from sensor where codsensor = 'STAST-478') as T2 on dados.nomedispositivo = T2.nomedispositivo;
+
+#3 - Qual a localização do tanque de armazenamento 'STUST-357'?
+
+select localizacao from tanque where codtanq = 'STUST-357';
